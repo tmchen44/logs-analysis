@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import psycopg2
+import sys
 
 DBNAME = 'news'
 
@@ -80,7 +81,7 @@ def select_query(query):
 
 
 def print_results(title, results):
-    """Prints the results of a query to the command line.
+    """Prints the results of a query to the command line and a text file.
 
     Args:
         title (string): The title of the results table
@@ -88,53 +89,38 @@ def print_results(title, results):
         header (list) of the table, and the second is the data (list) from each
         row.
     """
-    print(title)
-    headers = results[0]
-    rows = results[1]
-    n_col = len(headers)
-    for i, header in enumerate(headers):
-        if i == n_col - 1:
-            print(header)
-        else:
-            print(header + ' -- ', end='')
-    for row in rows:
-        for i, col in enumerate(row):
-            if i == n_col - 1:
-                print(str(col))
-            else:
-                print(str(col) + ' -- ', end='')
-    print()
-    print_to_file(title, results)
+    printer(title, results)
+    printer(title, results, open("results.txt", "a"))
     return
 
 
-def print_to_file(title, results):
-    """Prints the results of a query to a file called 'results.txt'.
+def printer(title, results, file_handle=sys.stdout):
+    """Prints content to the command line or a text file.
 
     Args:
         title (string): The title of the results table
         results (tuple): Tuple consisting of two elements. The first is the
         header (list) of the table, and the second is the data (list) from each
         row.
+        file_handle (object): Object handle containing the output destination
+        of the print function, which is the command line or a file.
     """
-    f = open('results.txt', 'a')
-    f.write(title + '\n')
+    print(title, file=file_handle)
     headers = results[0]
     rows = results[1]
     n_col = len(headers)
     for i, header in enumerate(headers):
         if i == n_col - 1:
-            f.write(header + '\n')
+            print(header, file=file_handle)
         else:
-            f.write(header + ' -- ')
+            print(header + ' -- ', end='', file=file_handle)
     for row in rows:
         for i, col in enumerate(row):
             if i == n_col - 1:
-                f.write(str(col) + '\n')
+                print(str(col), file=file_handle)
             else:
-                f.write(str(col) + ' -- ')
-    f.write('\n')
-    f.close()
+                print(str(col) + ' -- ', end='', file=file_handle)
+    print(file=file_handle)
     return
 
 
